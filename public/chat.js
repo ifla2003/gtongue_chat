@@ -154,18 +154,45 @@ function appendMessage(msg, type) {
     let formattedMessage = msg.message.replace(/\n/g, '<br>'); // Replace newlines with <br>
 
     let timestamp = convertToIST(msg.timestamp);
-    
-    let markup = `
-        <p>${formattedMessage}</p>
 
-        <span class="timestamp">${timestamp}</span>
-    `;
+    // Create the message content container
+    let messageContent = document.createElement('div');
+    messageContent.classList.add('message-content');
+    messageContent.innerHTML = `<p>${formattedMessage}</p>`;
 
-    mainDiv.innerHTML = markup;
-    
-    //add the audio if exists - [After Message]
-    if(msg.audioElement) mainDiv.appendChild(msg.audioElement);
+    // Create the audio container
+    let audioContainer = null;
+    if (msg.audioElement) {
+        audioContainer = document.createElement('div');
+        audioContainer.classList.add('audio-container');
+        
+        // Create a play icon
+        let playIcon = document.createElement('span');
+        playIcon.classList.add('audio-icon');
+        playIcon.textContent = '🔊'; // Use an emoji or replace with an icon from a library
+        
+        // Add click event to play audio
+        playIcon.addEventListener('click', () => {
+            msg.audioElement.play();
+        });
 
+        audioContainer.appendChild(playIcon);
+        // audioContainer.appendChild(msg.audioElement); // Append the audio element
+    }
+
+    // Add message content and audio container (if exists) to the mainDiv
+    mainDiv.appendChild(messageContent);
+    if (audioContainer) {
+        mainDiv.appendChild(audioContainer);
+    }
+
+    // Add timestamp
+    let timestampDiv = document.createElement('div');
+    timestampDiv.classList.add('timestamp');
+    timestampDiv.textContent = timestamp;
+    mainDiv.appendChild(timestampDiv);
+
+    // Append the message to the message area
     let lastMessage = messageArea.lastElementChild;
     let lastDay = lastMessage?.querySelector('.day');
     let messageDate = new Date(msg.timestamp);
@@ -182,11 +209,12 @@ function appendMessage(msg, type) {
         }
 
         messageArea.appendChild(dayDiv);
-        
     }
 
     messageArea.appendChild(mainDiv);
+    scrollToBottom();
 }
+
 
 
 
