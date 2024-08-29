@@ -55,6 +55,7 @@ fileInput.addEventListener('change', (event) => {
     }
 });
 
+// Event listener for add contact form
 document.getElementById('addContactForm').addEventListener('submit', (event) => {
     event.preventDefault();
 
@@ -84,6 +85,7 @@ document.getElementById('addContactForm').addEventListener('submit', (event) => 
       });
 });
 
+// Send message on Enter key or Send button click
 textarea.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault(); // Prevent the default action (new line)
@@ -99,6 +101,7 @@ sendButton.addEventListener('click', () => {
     }
 });
 
+// Show context menu on right-click on a message
 messageArea.addEventListener('contextmenu', (event) => {
     event.preventDefault();
 
@@ -110,17 +113,20 @@ messageArea.addEventListener('contextmenu', (event) => {
     }
 });
 
+// Hide context menu on outside click
 document.addEventListener('click', (event) => {
     if (!event.target.closest('.context-menu')) {
         contextMenu.style.display = 'none';
     }
 });
 
+// Delete message for the current user
 deleteForMeButton.addEventListener('click', () => {
     deleteMessageForMe(selectedMessageId);
     contextMenu.style.display = 'none';
 });
 
+// Delete message for everyone
 deleteForEveryoneButton.addEventListener('click', () => {
     deleteMessageForEveryone(selectedMessageId);
     contextMenu.style.display = 'none';
@@ -420,19 +426,20 @@ function formatDate(timestamp) {
 
 
 
-function deleteMessageForMe(msgId) {
-    let messageDiv = document.querySelector(`div[data-id='${msgId}']`);
-    if (messageDiv) {
-        messageDiv.remove();
+function deleteMessageForMe(messageId) {
+    let messageElement = document.querySelector(`.message[data-id="${messageId}"]`);
+    if (messageElement) {
+        messageElement.remove();
+        let chatHistory = JSON.parse(localStorage.getItem(`chatHistory_${selectedContact}`)) || [];
+        let updatedChatHistory = chatHistory.filter(msg => msg.id !== parseInt(messageId));
+        localStorage.setItem(`chatHistory_${selectedContact}`, JSON.stringify(updatedChatHistory));
     }
-
-    let chatHistory = JSON.parse(localStorage.getItem(`chatHistory_${selectedContact}`)) || [];
-    chatHistory = chatHistory.filter(msg => msg.id !== msgId);
-    localStorage.setItem(`chatHistory_${selectedContact}`, JSON.stringify(chatHistory));
 }
 
-function deleteMessageForEveryone(msgId) {
-    socket.emit('deleteMessageForEveryone', { msgId, userId });
+// Delete a message for everyone
+function deleteMessageForEveryone(messageId) {
+    socket.emit('deleteMessageForEveryone', messageId);
+    deleteMessageForMe(messageId);
 }
 
 socket.on('deleteMessageForEveryone', (msgId) => {
