@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div id="auth">
+        <div id="register">
+            <h2>Register</h2>
+            <input type="text" id="reg_username" placeholder="Username">
+            <input type="password" id="reg_password" placeholder="Password">
+            <button id="registerButton">Register</button>
+            <p id="showLogin">Already have an account? Login</p>
+        </div>
+        <div id="login" style="display:none;">
+            <h2>Login</h2>
+            <input type="text" id="log_username" placeholder="Username">
+            <input type="password" id="log_password" placeholder="Password">
+            <button id="loginButton">Login</button>
+            <p id="showRegister">Don't have an account? Register</p>
+        </div>
+    </div>
+    <div id="chat" style="display:none;">
+        <div id="contacts" class="sidebar">
+            <h2>Contacts</h2>
+            <ul id="contactList"></ul>
+            <form id="addContactForm">
+                <input type="text" id="contactUsername" placeholder="Add contact by username">
+                <button id="addContactButton">Add Contact</button>
+            </form>
+            <button id="logoutButton" class="icon-button"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+        <div id="mainChat">
+            <h2>Welcome, <span id="usernameDisplay"></span></h2>
+            <h3 id="contactNameDisplay"></h3>
+            <div id="callButtons">
+                <button id="videoCallButton" class="icon-button video-call">📹</button>
+                <button id="audioCallButton" class="icon-button audio-call">📞</button>
+            </div>
+            <div class="message_area" id="messageArea"></div>
+            <div class="container">
+            <div class="form-group">
+            <label for="selected_lan">Select Language to chat</label>
+            <select name="selected_lan" id="selected_lan" class="form-control"></select>
+        </div>
+    </div>
+
+                <div class="input_container">
+                    <button id="emoji-button">☺️</button>
+                    <div class="emoji-picker" id="emoji-picker"></div>
+                    <button id="voice-button">🎤</button>
+                    <div class="attachment-menu">
+                    <button id="attachButton" class="icon-button"><i class="fas fa-paperclip"></i></button>
+                    <div class="attachment-options" id="attachmentOptions">
+                        <button id="photoAttachment" class="attachment-option"><i class="fas fa-camera"></i> Photo</button>
+                        <button id="videoAttachment" class="attachment-option"><i class="fas fa-video"></i> Video</button>
+                        <button id="documentAttachment" class="attachment-option"><i class="fas fa-file-alt"></i> Document</button>
+                        <button id="cameraAttachment" class="attachment-option"><i class="fas fa-camera-retro"></i> Camera</button>
+                        <button id="contactsAttachment" class="attachment-option"><i class="fas fa-address-book"></i> Contacts</button>
+                    </div> 
+                </div>
+
+                <!-- <button id="logoutButton">Logout</button> -->
+
+                <div class="textarea-container">
+                    <textarea id="Textarea" placeholder="Enter your message"></textarea>
+                    <div class="mic-icon" id="mic-icon">
+                        <!-- Example of a mic icon using SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 15c1.66 0 3-1.34 3-3V6c0-1.66-1.34-3-3-3s-3 1.34-3 3v6c0 1.66 1.34 3 3 3zm4.3-3c0 2.25-1.8 4.09-4.04 4.09-2.25 0-4.05-1.84-4.05-4.09h-2.1c0 3.36 2.61 6.11 6.01 6.74v3.26h2v-3.26c3.39-.63 6-3.38 6-6.74h-2.1z"/>
+                        </svg>
+                    </div>
+                </div>
+                <button id="sendButton" class="icon-button"><i class="fas fa-paper-plane"></i></button>
+            </div>    
+                <div id="videoContainer">
+                    <video id="localVideo" autoplay muted></video>
+                    <video id="remoteVideo" autoplay></video>
+                    <button id="disconnectButton" class="icon-button"><i class="fas fa-phone-slash"></i></button>
+                </div>
+            </div>
+            <div id="callRequestModal" style="display: none;">
+                <p id="callRequestMessage"></p>
+                <button id="acceptCallButton">Accept</button>
+                <button id="rejectCallButton">Reject</button>
+            </div>
+            <div id="allUsers" class="sidebar right-sidebar">
+                <h2>All Users</h2>
+                <ul id="allUsersList"></ul>
+            </div>
+    </div>
+    <div id="contextMenu" class="context-menu" style="display: none;">
+        <ul>
+            <li id="deleteForMe">Delete for Me</li>
+            <li id="deleteForEveryone">Delete for Everyone</li>
+        </ul>
+    </div>
+    <!-- Modal for displaying contacts -->
+    <div id="contactsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeContactsModal">&times;</span>
+            <h2>Select a contact to share</h2>
+            <ul id="contactsList"></ul>
+        </div>
+    </div>
+    <!-- Modal for camera -->
+    <div id="cameraModal" class="modal">
+        <div id="cameraModalContent" class="modal-content">
+            <span class="close" id="closeCameraModal">&times;</span>
+            <video id="cameraVideo" autoplay></video>
+            <button id="captureButton">Capture</button>
+        </div>
+    </div>
+    <script src="//code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="chat.js"></script>
+    <script src="auth.js"></script>
+    <script src="calling.js"></script>
+    <script src="voice.js"></script>
+    <script src="emojies.js"></script>
+    <script src="speechToText.js"></script>
+
+    <script>
+  const languageSelector = document.getElementById('selected_lan');
+        fetch('https://gtongue.com/api/get_languages_list.php', {
+
+             method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+
+                let sorteddata = data.sort((a, b) => a.script.localeCompare(b.script));
+                // let selectElement = document.getElementById('selected_lan');
+                console.log(data);
+                sorteddata.forEach(language => {
+                    let option = document.createElement('option');
+                    option.value = language.language;
+                    option.textContent = language.display_name;
+                    option.setAttribute('script', language.script);
+                    option.setAttribute('lan_code', language.lan_code);
+                    languageSelector.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    </script>
+    <script src="js/jsapi.js"></script>
+    <script src="js/typing.js" type="text/javascript"></script>
+</body>
+</html>
