@@ -52,16 +52,46 @@ const upload = multer();
 // Registration route
 app.post('/register', (req, res) => {
     const { username, password } = req.body;
-    bcrypt.hash(password, 10, (err, hash) => {
-        if (err) throw err;
-        const user = { username, password: hash };
-        const sql = 'INSERT INTO users SET ?';
-        db.query(sql, user, (err, result) => {
-            if (err) throw err;
-            res.send('User registered');
-        });
+
+    if (!username || !password) {
+        return res.status(400).send('Username and password are required');
+    }
+
+    // Check if username already exists
+    const checkUserQuery = 'SELECT * FROM users WHERE username = ?';
+    db.query(checkUserQuery, [username], (err, results) => {
+        if (err) {
+            console.error('Error checking user existence:', err);
+            return res.status(500).send('Error checking user existence');
+        }
+
+        if (results.length > 0) {
+            console.log(`Username ${username} already taken`);
+            // Username already exists
+            return res.status(400).send('Username already taken');
+        } else {
+            // Proceed with registration
+            bcrypt.hash(password, 10, (err, hash) => {
+                if (err) {
+                    console.error('Error hashing password:', err);
+                    return res.status(500).send('Error hashing password');
+                }
+
+                const user = { username, password: hash };
+                const sql = 'INSERT INTO users SET ?';
+                db.query(sql, user, (err, result) => {
+                    if (err) {
+                        console.error('Error registering user:', err);
+                        return res.status(500).send('Error registering user');
+                    }
+                    console.log('User registered successfully');
+                    res.send('User registered');
+                });
+            });
+        }
     });
 });
+
 
 // Login route
 app.post('/login', (req, res) => {
